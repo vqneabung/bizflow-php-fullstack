@@ -1,7 +1,7 @@
 /**
  * Users/Index.tsx — Admin user list (TanStack Table).
  */
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { Head, Link } from '@inertiajs/react'
 import {
   useReactTable,
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function UserIndex({ auth, users }: Props) {
-  const [sorting, setSorting] = useMemo(() => [], []) as [SortingState, (val: SortingState) => void]
+  const [sorting, setSorting] = useState<SortingState>([])
 
   const columnHelper = createColumnHelper<SpringUser>()
 

@@ -2,9 +2,11 @@
  * AdminLayout.tsx — Layout cho admin dashboard (sidebar + header).
  *
  * Dùng chung style với Next.js dashboard nhưng với Inertia + React.
+ *
+ * Lưu ý: Không dùng 'use client' — Inertia React components mặc định
+ * chạy ở client, không cần directive này (khác với Next.js).
+ * Dùng usePage().url để lấy pathname thay vì window.location.
  */
-'use client'
-
 import { Link, usePage } from '@inertiajs/react'
 import { Toaster } from '@/components/ui/sonner'
 import type { AdminUser } from '@/types/admin'
@@ -15,8 +17,8 @@ const navItems = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  // @ts-expect-error Inertia page props
-  const { auth } = usePage<{ auth: { user: AdminUser } }>().props
+  const { auth, url } = usePage<{ auth: { user: AdminUser }; url: string }>()
+  const currentPath = url
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -29,7 +31,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
-            const isActive = window.location.pathname === item.href
+            const isActive = currentPath === item.href
             return (
               <Link
                 key={item.href}

@@ -49,12 +49,16 @@ class SpringOAuthService
      */
     public function generatePkce(): array
     {
-        $verifier = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
-        $challenge = rtrim(strtr(base64_encode(
-            hash('sha256', $verifier, true)
-        ), '+/', '-_'), '=');
+        $verifier = $this->base64urlEncode(random_bytes(32));
+        $challenge = $this->base64urlEncode(hash('sha256', $verifier, true));
 
         return ['verifier' => $verifier, 'challenge' => $challenge];
+    }
+
+    /** Encode bytes thành base64url (thay +/ bằng -_) */
+    private function base64urlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 
     /**
@@ -176,7 +180,6 @@ class SpringOAuthService
             $this->jwkKeys = JWK::parseKeySet($jwks);
         }
 
-        // Lấy key đầu tiên (Spring Boot thường chỉ có 1 RSA key pair)
         $key = reset($this->jwkKeys);
 
         return new Key($key->getKeyMaterial(), 'RS256');
