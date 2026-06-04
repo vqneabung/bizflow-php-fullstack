@@ -2,14 +2,13 @@
  * Users/Show.tsx — User detail page.
  */
 import { Head, Link } from '@inertiajs/react'
-import type { SpringUser, AdminUser } from '@/types/admin'
+import type { SpringUser } from '@/types/admin'
 
 interface Props {
-  auth: { user: AdminUser }
   user: SpringUser | null
 }
 
-export default function UserShow({ auth, user }: Props) {
+export default function UserShow({ user }: Props) {
   return (
     <>
       <Head title={user ? `User #${user.id}` : 'User'} />

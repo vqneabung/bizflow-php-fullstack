@@ -11,14 +11,13 @@ import {
 } from '@tanstack/react-table';
 import type { SortingState } from '@tanstack/react-table';
 import { useState, useMemo } from 'react';
-import type { SpringUser, AdminUser } from '@/types/admin';
+import type { SpringUser } from '@/types/admin';
 
 interface Props {
-    auth: { user: AdminUser };
     users: SpringUser[];
 }
 
-export default function UserIndex({ auth, users }: Props) {
+export default function UserIndex({ users }: Props) {
     const [sorting, setSorting] = useState<SortingState>([]);
 
     const columnHelper = createColumnHelper<SpringUser>();
