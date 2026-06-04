@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 // Nếu đã login → vào dashboard luôn
 Route::redirect('/', '/admin/dashboard');
 
+Route::redirect('/admin', '/admin/dashboard');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
 });

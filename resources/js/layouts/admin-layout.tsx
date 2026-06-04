@@ -17,8 +17,9 @@ const navItems = [
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { auth, url } = usePage<{ auth: { user: AdminUser }; url: string }>()
-  const currentPath = url
+  const page = usePage<{ auth: { user: AdminUser }; csrf_token: string }>()
+  const { auth, csrf_token } = page.props
+  const currentPath = page.url
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -60,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center gap-3">
               <span className="text-sm text-zinc-500">{auth?.user?.name ?? 'Admin'}</span>
               <form method="POST" action="/logout">
-                <input type="hidden" name="_token" value={document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? ''} />
+                <input type="hidden" name="_token" value={csrf_token} />
                 <button type="submit" className="text-sm text-zinc-500 hover:text-red-600 transition-colors">
                   Sign Out
                 </button>

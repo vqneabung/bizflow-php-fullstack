@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
-use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
 
@@ -19,27 +21,19 @@ use Illuminate\Support\Facades\Http;
  */
 class SpringOAuthService
 {
-    /** URL của Spring Boot Auth Server (ví dụ: http://localhost:8080) */
-    private string $baseUrl;
-
-    /** Client ID đăng ký trong Spring Boot DataInitializer */
-    private string $clientId;
-
-    /** Client Secret — lưu trong .env, không hardcode */
-    private string $clientSecret;
-
-    /** Redirect URI — khớp với đăng ký trong DataInitializer */
-    private string $redirectUri;
-
     /** Cache JWKS keys để tránh gọi lại mỗi lần validate */
     private ?array $jwkKeys = null;
 
-    public function __construct()
-    {
-        $this->baseUrl = config('services.spring.base_url', 'http://localhost:8080');
-        $this->clientId = config('services.spring.client_id', 'laravel-admin-client');
-        $this->clientSecret = config('services.spring.client_secret', 'admin-secret');
-        $this->redirectUri = config('services.spring.redirect_uri', 'http://localhost:8000/admin/callback');
+    public function __construct(
+        private string $baseUrl = 'http://localhost:8080',
+        private string $clientId = 'laravel-admin-client',
+        private string $clientSecret = 'admin-secret',
+        private string $redirectUri = 'http://localhost:8000/admin/callback',
+    ) {
+        $this->baseUrl = config('services.spring.base_url', $this->baseUrl);
+        $this->clientId = config('services.spring.client_id', $this->clientId);
+        $this->clientSecret = config('services.spring.client_secret', $this->clientSecret);
+        $this->redirectUri = config('services.spring.redirect_uri', $this->redirectUri);
     }
 
     /**
@@ -64,7 +58,7 @@ class SpringOAuthService
     /**
      * Build URL để redirect user đến Spring Boot /oauth2/authorize.
      *
-     * @param string $codeChallenge code_challenge từ generatePkce()
+     * @param  string  $codeChallenge  code_challenge từ generatePkce()
      * @return string URL redirect
      */
     public function getAuthorizeUrl(string $codeChallenge): string
@@ -82,10 +76,24 @@ class SpringOAuthService
     }
 
     /**
+     * Build URL xóa JSESSIONID trước khi bắt đầu OIDC flow.
+     *
+     * Trước khi redirect user đến /oauth2/authorize, redirect đến endpoint này
+     * để clear session cũ (từ Next.js login). Tránh auto-authorize với wrong user.
+     *
+     * @param  string  $authorizeUrl  URL đầy đủ đến /oauth2/authorize (từ getAuthorizeUrl)
+     * @return string URL redirect
+     */
+    public function getClearSessionUrl(string $authorizeUrl): string
+    {
+        return "{$this->baseUrl}/api/auth/session/clear-session?redirect=".urlencode($authorizeUrl);
+    }
+
+    /**
      * Exchange authorization_code lấy JWT access_token.
      *
-     * @param string $code Authorization code từ callback
-     * @param string $codeVerifier Code verifier từ generatePkce()
+     * @param  string  $code  Authorization code từ callback
+     * @param  string  $codeVerifier  Code verifier từ generatePkce()
      * @return array{access_token: string, refresh_token?: string, ...}
      *
      * @throws \RuntimeException Nếu Spring Boot trả lỗi
@@ -103,7 +111,7 @@ class SpringOAuthService
 
         if (! $response->successful()) {
             throw new \RuntimeException(
-                'Token exchange failed: ' . $response->body(),
+                __('messages.error.token_exchange', ['message' => $response->body()]),
                 $response->status()
             );
         }
@@ -114,7 +122,7 @@ class SpringOAuthService
     /**
      * Validate JWT signature dùng RSA public key từ Spring Boot JWKS endpoint.
      *
-     * @param string $jwt JWT access_token
+     * @param  string  $jwt  JWT access_token
      * @return object Decoded payload (chứa sub, email, role, ...)
      *
      * @throws \RuntimeException Nếu JWT không hợp lệ
@@ -126,17 +134,17 @@ class SpringOAuthService
 
             return JWT::decode($jwt, $keys);
         } catch (\Exception $e) {
-            throw new \RuntimeException('JWT validation failed: ' . $e->getMessage());
+            throw new \RuntimeException(__('messages.error.jwt_validation', ['message' => $e->getMessage()]));
         }
     }
 
     /**
      * Gọi Spring Boot API với Bearer token.
      *
-     * @param string $method HTTP method (GET, POST, PUT, DELETE)
-     * @param string $path API path (ví dụ: /api/admin/users)
-     * @param array $data Request body (cho POST/PUT)
-     * @param string|null $jwt JWT access_token (nếu null, lấy từ session)
+     * @param  string  $method  HTTP method (GET, POST, PUT, DELETE)
+     * @param  string  $path  API path (ví dụ: /api/admin/users)
+     * @param  array  $data  Request body (cho POST/PUT)
+     * @param  string|null  $jwt  JWT access_token (nếu null, lấy từ session)
      * @return array Response từ Spring Boot
      */
     public function callApi(string $method, string $path, array $data = [], ?string $jwt = null): array
@@ -149,7 +157,7 @@ class SpringOAuthService
 
         if (! $response->successful()) {
             throw new \RuntimeException(
-                'Spring API error: ' . $response->body(),
+                __('messages.error.spring_api', ['message' => $response->body()]),
                 $response->status()
             );
         }
@@ -169,8 +177,6 @@ class SpringOAuthService
 
     /**
      * Fetch JWKS keys từ Spring Boot, cache trong request.
-     *
-     * @return Key
      */
     private function getJwksKeys(): Key
     {

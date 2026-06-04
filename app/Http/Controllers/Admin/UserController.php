@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin;
 
 use App\Services\SpringOAuthService;
@@ -28,7 +30,7 @@ class UserController extends Controller
             $users = $this->oauth->getUsers();
         } catch (\Exception $e) {
             $users = [];
-            session()->flash('error', 'Failed to fetch users: ' . $e->getMessage());
+            session()->flash('error', __('messages.user.fetch_failed', ['message' => $e->getMessage()]));
         }
 
         return Inertia::render('Admin/Users/Index', [
@@ -43,7 +45,7 @@ class UserController extends Controller
             $user = $this->oauth->callApi('GET', "/api/admin/users/{$id}");
         } catch (\Exception $e) {
             $user = null;
-            session()->flash('error', 'Failed to fetch user: ' . $e->getMessage());
+            session()->flash('error', __('messages.user.fetch_failed_single', ['message' => $e->getMessage()]));
         }
 
         return Inertia::render('Admin/Users/Show', [
