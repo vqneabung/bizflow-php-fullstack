@@ -1,3 +1,161 @@
+# AGENTS.md — bizflow-php-fullstack (Laravel 13 + Inertia 3 + React 19)
+
+## Cấu trúc dự án
+
+```
+bizflow-php-fullstack/
+├── app/                        # Application code
+│   ├── Actions/                # Single-purpose action classes
+│   ├── Concerns/               # Trait-like reusable logic
+│   ├── Exceptions/             # Custom exception classes
+│   ├── Http/                   # HTTP layer
+│   │   ├── Controllers/        # Route controllers
+│   │   ├── Middleware/         # Custom middleware
+│   │   ├── Requests/           # Form request validation
+│   │   └── Resources/          # API resources
+│   ├── Models/                 # Eloquent models
+│   ├── Providers/              # Service providers
+│   └── Services/               # Business services
+├── bootstrap/                  # Laravel bootstrap
+│   ├── app.php                 # Application config
+│   └── providers.php           # Provider registration
+├── config/                     # Configuration files
+│   ├── app.php
+│   ├── auth.php
+│   ├── database.php
+│   ├── fortify.php             # Fortify auth
+│   ├── inertia.php             # Inertia config
+│   ├── services.php            # External services (Spring Boot API base URL)
+│   └── ...
+├── database/
+│   ├── factories/              # Model factories
+│   ├── migrations/             # Database migrations
+│   └── seeders/                # Database seeders
+├── lang/                       # Localization
+│   ├── en/
+│   └── vi/
+├── public/                     # Web root
+│   └── index.php
+├── resources/
+│   ├── js/                     # React frontend
+│   │   ├── pages/              # Inertia pages
+│   │   ├── components/         # React components
+│   │   ├── actions/            # Wayfinder-generated controller functions
+│   │   ├── routes/             # Wayfinder-generated route functions
+│   │   └── types/              # TypeScript types
+│   └── views/                  # Blade templates (root)
+├── routes/
+│   ├── console.php             # Artisan commands
+│   ├── settings.php            # Settings routes
+│   └── web.php                 # Web routes (Inertia)
+├── tests/
+│   ├── Feature/                # Feature tests (Pest)
+│   ├── Unit/                   # Unit tests
+│   ├── Pest.php                # Pest configuration
+│   └── TestCase.php            # Base test class
+├── eslint.config.js            # ESLint config
+├── phpunit.xml                 # PHPUnit/Pest config
+├── vite.config.ts              # Vite config (with Wayfinder + Inertia plugins)
+├── pnpm-workspace.yaml         # pnpm workspace
+└── pnpm-lock.yaml
+```
+
+## Layer rules
+
+| Layer | Path | Rule |
+|---|---|---|
+| **Routes** | `routes/web.php` | Define routes only, delegate to controller. |
+| **Controllers** | `app/Http/Controllers/` | Single responsibility, return Inertia response hoặc API resource. |
+| **Actions** | `app/Actions/` | Single-purpose classes cho business operations (Laravel pattern). |
+| **Models** | `app/Models/` | Eloquent models với relationships, scopes, casts. |
+| **Services** | `app/Services/` | Business logic, external API clients (Spring Boot). |
+| **Requests** | `app/Http/Requests/` | Form request validation (`authorize()`, `rules()`). |
+| **Resources** | `app/Http/Resources/` | API response transformation. |
+| **Frontend** | `resources/js/` | React + Inertia (pages) + Tailwind. |
+
+## PHP rules
+
+1. **PHP 8.5+** features: constructor property promotion, readonly properties, enums, fibers (nếu cần).
+2. **Strict types**: `declare(strict_types=1);` ở đầu file.
+3. **No `mixed`**: dùng union types hoặc `object` thay vì `mixed` khi có thể.
+4. **Type hints bắt buộc** cho parameters + return types.
+5. **Curly braces** cho mọi control structure (kể cả single-line).
+6. **TitleCase** cho Enum keys.
+7. **PHPDoc** blocks cho complex types, generics, array shapes — KHÔNG dùng inline comments.
+
+## Laravel rules
+
+1. **Artisan cho mọi generation**: `php artisan make:model X -a` (model + migration + factory + seeder + controller).
+2. **Form Requests** cho validation (không validate trong controller).
+3. **Eloquent API Resources** cho API responses.
+4. **Named routes** + `route()` helper thay vì hard-code URLs.
+5. **Factories** cho test data — KHÔNG tạo model manually trong tests.
+6. **Pest** cho testing, feature tests > unit tests.
+7. **Laravel Pint** format code: `vendor/bin/pint --dirty --format agent` trước khi commit.
+
+## TypeScript rules (React frontend)
+
+1. **No `any`** — dùng `unknown` + type guards.
+2. **Inertia v3 page props**: dùng `usePage<T>().props` cho type-safe data.
+3. **Wayfinder** cho navigation: `import { show } from '@/actions/ProductController'` thay vì hard-code URL.
+4. **Tailwind v4** cho styling — utility classes, KHÔNG inline styles.
+5. **Discriminated unions** cho state machines.
+
+## TypeScript ↔ PHP naming mapping
+
+| PHP | TypeScript |
+|---|---|
+| `string` | `string` |
+| `int` | `number` |
+| `float` | `number` |
+| `bool` | `boolean` |
+| `array<T>` | `T[]` |
+| `?Type` (nullable) | `Type \| null` |
+| `class X { public string $name; }` | `interface X { name: string }` |
+| `enum E: string { case A = 'a'; }` | `type E = 'a'` (string) hoặc `const E = { A: 'a' } as const` |
+
+## Quy tắc code
+
+- **Package manager**: `pnpm` cho frontend, `composer` cho PHP.
+- **Frontend bundling**: Vite (`@inertiajs/vite` plugin). Build với `npm run build` hoặc `composer run dev`.
+- **Path alias**: `@/` → `resources/js/`.
+- **Routing**: file-based với Inertia pages (`@inertiajs/inertia-react`).
+
+## Future folder predictions
+
+```
+app/
+├── Modules/                    # Feature-based modules
+│   ├── Products/
+│   │   ├── Actions/
+│   │   ├── Http/
+│   │   ├── Models/
+│   │   └── Services/
+│   └── Reports/
+├── Exports/                    # Excel/CSV exports
+├── Imports/                    # Excel/CSV imports
+└── Notifications/              # Email/SMS notifications
+resources/js/
+├── hooks/                      # Custom React hooks
+├── stores/                     # State management (Zustand/Jotai)
+├── lib/                        # Utility functions
+└── components/                 # Shared UI components (shadcn/ui)
+```
+
+## Anti-patterns cần tránh
+
+- ❌ `any` trong TypeScript
+- ❌ Validate trong controller (dùng Form Request)
+- ❌ Trả về Eloquent model trực tiếp từ API (dùng API Resource)
+- ❌ Hard-code URLs (dùng named routes + `route()`)
+- ❌ Tạo model manual trong tests (dùng factory)
+- ❌ `mixed` type (dùng union types cụ thể)
+- ❌ `dd()` / `dump()` trong production code
+- ❌ Catch `Exception` chung (catch specific)
+- ❌ Comment "what" — chỉ comment "why"
+
+---
+
 <laravel-boost-guidelines>
 === foundation rules ===
 
