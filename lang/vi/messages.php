@@ -12,6 +12,8 @@ return [
     'user' => [
         'fetch_failed' => 'Không thể tải danh sách người dùng: :message',
         'fetch_failed_single' => 'Không thể tải thông tin người dùng: :message',
+        'deleted' => 'Đã xóa user thành công',
+        'delete_failed' => 'Xóa thất bại: :message',
     ],
     'error' => [
         'token_exchange' => 'Trao đổi token thất bại: :message',

@@ -1,7 +1,7 @@
 /**
  * Users/Index.tsx — Admin user list (TanStack Table).
  */
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -15,6 +15,29 @@ import type { SpringUser } from '@/types/admin';
 
 interface Props {
     users: SpringUser[];
+}
+
+function DeleteUserButton({ id, email }: { id: string | number; email: string }) {
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const handleDelete = () => {
+        if (!confirm(`Xóa user ${email}? Hành động này không thể hoàn tác.`)) return;
+
+        setIsDeleting(true);
+        router.delete(`/admin/users/${id}`, {
+            onFinish: () => setIsDeleting(false),
+        });
+    };
+
+    return (
+        <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="text-red-600 hover:underline text-sm font-medium disabled:opacity-50"
+        >
+            {isDeleting ? 'Đang xóa...' : 'Xóa'}
+        </button>
+    );
 }
 
 export default function UserIndex({ users }: Props) {
@@ -60,6 +83,24 @@ export default function UserIndex({ users }: Props) {
                         {info.getValue()}
                     </span>
                 ),
+            }),
+            columnHelper.display({
+                id: 'actions',
+                header: 'Thao tác',
+                cell: (info) => {
+                    const user = info.row.original;
+                    return (
+                        <div className="flex items-center gap-3">
+                            <Link
+                                href={`/admin/users/${user.id}`}
+                                className="text-purple-600 hover:underline text-sm font-medium"
+                            >
+                                Xem
+                            </Link>
+                            <DeleteUserButton id={user.id} email={user.email} />
+                        </div>
+                    );
+                },
             }),
         ],
         [columnHelper],
@@ -129,7 +170,7 @@ export default function UserIndex({ users }: Props) {
                             {(users ?? []).length === 0 && (
                                 <tr>
                                     <td
-                                        colSpan={4}
+                                        colSpan={5}
                                         className="px-6 py-12 text-center text-zinc-400"
                                     >
                                         No users found. Make sure Spring Boot is

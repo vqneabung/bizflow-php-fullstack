@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Services\SpringOAuthService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Inertia\Inertia;
@@ -52,5 +53,22 @@ class UserController extends Controller
             'user' => $user,
             'auth' => ['user' => session('admin_user')],
         ]);
+    }
+
+    /**
+     * Xóa user (soft delete) qua Spring Boot DELETE /api/admin/users/{id}.
+     */
+    public function destroy(string $id): RedirectResponse
+    {
+        try {
+            $this->oauth->callApi('DELETE', "/api/admin/users/{$id}");
+            session()->flash('success', __('messages.user.deleted'));
+        } catch (\Exception $e) {
+            session()->flash('error', __('messages.user.delete_failed', [
+                'message' => $e->getMessage(),
+            ]));
+        }
+
+        return redirect()->route('admin.users.index');
     }
 }

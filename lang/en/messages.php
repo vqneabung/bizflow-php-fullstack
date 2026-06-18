@@ -12,6 +12,8 @@ return [
     'user' => [
         'fetch_failed' => 'Failed to fetch users: :message',
         'fetch_failed_single' => 'Failed to fetch user: :message',
+        'deleted' => 'User deleted successfully',
+        'delete_failed' => 'Delete failed: :message',
     ],
     'error' => [
         'token_exchange' => 'Token exchange failed: :message',
