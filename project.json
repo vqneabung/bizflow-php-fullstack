@@ -1,0 +1,42 @@
+{
+  "name": "bizflow-php-fullstack",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "resources/js",
+  "projectType": "application",
+  "tags": ["scope:admin", "lang:php", "framework:laravel"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm build",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true,
+      "outputs": ["{projectRoot}/public/build/**", "{projectRoot}/public/hot"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm dev",
+        "cwd": "{projectRoot}"
+      },
+      "cache": false
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm lint",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm types:check",
+        "cwd": "{projectRoot}"
+      },
+      "cache": true
+    }
+  }
+}
