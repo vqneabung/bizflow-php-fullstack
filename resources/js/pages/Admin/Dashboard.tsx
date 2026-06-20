@@ -4,13 +4,19 @@
  * AdminLayout được áp dụng tự động từ app.tsx layout resolver.
  */
 import { Head } from '@inertiajs/react'
-import type { AdminUser } from '@/types/admin'
+import type { AdminUser, SpringOverview } from '@/types/admin'
 
 interface Props {
   auth: { user: AdminUser }
+  overview?: SpringOverview | null
+  totalUsers?: number | null
 }
 
-export default function AdminDashboard({ auth }: Props) {
+function formatCurrency(n: number): string {
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n)
+}
+
+export default function AdminDashboard({ auth, overview, totalUsers }: Props) {
   return (
     <>
       <Head title="Dashboard" />
@@ -27,10 +33,10 @@ export default function AdminDashboard({ auth }: Props) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Total Users', value: '—', icon: '👥' },
-            { label: 'Active Stores', value: '—', icon: '🏪' },
-            { label: 'Revenue', value: '—', icon: '💰' },
-            { label: 'Reports', value: '—', icon: '📊' },
+            { label: 'Tổng người dùng', value: totalUsers ?? '—', icon: '👥' },
+            { label: 'Khách hàng', value: overview?.totalCustomers ?? '—', icon: '🏪' },
+            { label: 'Doanh thu tháng', value: overview?.revenueThisMonth != null ? formatCurrency(overview.revenueThisMonth) : '—', icon: '💰' },
+            { label: 'Đơn hàng tháng', value: overview?.ordersThisMonth ?? '—', icon: '📊' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-xl border border-zinc-200 p-5 shadow-sm">
               <div className="flex items-start justify-between">

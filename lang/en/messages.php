@@ -14,6 +14,18 @@ return [
         'fetch_failed_single' => 'Failed to fetch user: :message',
         'deleted' => 'User deleted successfully',
         'delete_failed' => 'Delete failed: :message',
+        'updated' => 'User updated successfully.',
+        'update_failed' => 'Update failed: :message',
+    ],
+    'product' => [
+        'fetch_failed' => 'Failed to fetch products: :message',
+        'fetch_failed_single' => 'Failed to fetch product: :message',
+    ],
+    'order' => [
+        'fetch_failed' => 'Failed to fetch orders: :message',
+        'fetch_failed_single' => 'Failed to fetch order: :message',
+        'cancelled' => 'Order has been cancelled',
+        'cancel_failed' => 'Failed to cancel order: :message',
     ],
     'error' => [
         'token_exchange' => 'Token exchange failed: :message',

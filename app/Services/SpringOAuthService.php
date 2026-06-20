@@ -144,14 +144,24 @@ class SpringOAuthService
      * @param  string  $method  HTTP method (GET, POST, PUT, DELETE)
      * @param  string  $path  API path (ví dụ: /api/admin/users)
      * @param  array  $data  Request body (cho POST/PUT)
+     * @param  array|null  $query  Query string params (cho GET). Xung đột với $data.
      * @param  string|null  $jwt  JWT access_token (nếu null, lấy từ session)
-     * @return array Response từ Spring Boot
+     * @return array Response từ Spring Boot (đã unwrap ApiResponse.data)
      */
-    public function callApi(string $method, string $path, array $data = [], ?string $jwt = null): array
+    public function callApi(string $method, string $path, array $data = [], ?array $query = null, ?string $jwt = null): array
     {
+        if ($data !== [] && $query !== null) {
+            throw new \RuntimeException('Cannot provide both request body and query parameters.');
+        }
+
         $jwt ??= session('admin_jwt');
 
-        $response = Http::withToken($jwt)->send($method, "{$this->baseUrl}{$path}", [
+        $url = "{$this->baseUrl}{$path}";
+        if ($query !== null) {
+            $url .= '?'.http_build_query($query);
+        }
+
+        $response = Http::withToken($jwt)->send($method, $url, [
             'json' => $data,
         ]);
 
@@ -162,17 +172,51 @@ class SpringOAuthService
             );
         }
 
-        return $response->json() ?? [];
+        $body = $response->json() ?? [];
+        // ApiResponse<T> wrapper: { success, message, data } — unwrap to data
+        // PaginationResponse<T>: { success, message, data, pagination } — keep whole body (caller reads data + pagination)
+        if (
+            is_array($body)
+            && array_key_exists('data', $body)
+            && array_key_exists('success', $body)
+            && array_key_exists('message', $body)
+            && ! array_key_exists('pagination', $body)
+        ) {
+            return $body['data'] ?? [];
+        }
+
+        return $body;
+    }
+
+    /**
+     * Gọi Spring Boot API với GET method và query string params.
+     *
+     * @param  string  $path  API path
+     * @param  array  $query  Query string params
+     * @param  string|null  $jwt  JWT access_token
+     * @return array Response từ Spring Boot (đã unwrap)
+     */
+    public function callApiGet(string $path, array $query = [], ?string $jwt = null): array
+    {
+        return $this->callApi('GET', $path, [], $query, $jwt);
     }
 
     /**
      * Lấy danh sách users từ Spring Boot (/api/admin/users).
      *
+     * @param  int  $page  Số trang
+     * @param  int  $size  Số lượng mỗi trang
+     * @param  string|null  $search  Từ khóa tìm kiếm (tùy chọn)
      * @return array Danh sách users
      */
-    public function getUsers(): array
+    public function getUsers(int $page = 1, int $size = 20, ?string $search = null): array
     {
-        return $this->callApi('GET', '/api/admin/users');
+        $query = ['page' => $page, 'size' => $size];
+        if ($search !== null) {
+            $query['search'] = $search;
+        }
+
+        return $this->callApiGet('/api/admin/users', $query);
     }
 
     /**

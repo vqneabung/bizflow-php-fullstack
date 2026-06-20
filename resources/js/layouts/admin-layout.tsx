@@ -13,7 +13,9 @@ import type { AdminUser } from '@/types/admin'
 
 const navItems = [
   { key: 'dashboard', href: '/admin/dashboard', icon: '📊', label: 'Dashboard' },
-  { key: 'users', href: '/admin/users', icon: '👥', label: 'Users' },
+  { key: 'users', href: '/admin/users', icon: '👥', label: 'Người dùng' },
+  { key: 'products', href: '/admin/products', icon: '📦', label: 'Sản phẩm' },
+  { key: 'orders', href: '/admin/orders', icon: '🛒', label: 'Đơn hàng' },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

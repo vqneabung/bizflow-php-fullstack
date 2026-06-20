@@ -14,6 +14,18 @@ return [
         'fetch_failed_single' => 'Không thể tải thông tin người dùng: :message',
         'deleted' => 'Đã xóa user thành công',
         'delete_failed' => 'Xóa thất bại: :message',
+        'updated' => 'Cập nhật người dùng thành công.',
+        'update_failed' => 'Cập nhật người dùng thất bại.',
+    ],
+    'product' => [
+        'fetch_failed' => 'Không thể tải danh sách sản phẩm: :message',
+        'fetch_failed_single' => 'Không thể tải sản phẩm: :message',
+    ],
+    'order' => [
+        'fetch_failed' => 'Không thể tải danh sách đơn hàng: :message',
+        'fetch_failed_single' => 'Không thể tải đơn hàng: :message',
+        'cancelled' => 'Đơn hàng đã được hủy',
+        'cancel_failed' => 'Không thể hủy đơn hàng: :message',
     ],
     'error' => [
         'token_exchange' => 'Trao đổi token thất bại: :message',

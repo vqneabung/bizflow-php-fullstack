@@ -97,6 +97,12 @@ export default function UserIndex({ users }: Props) {
                             >
                                 Xem
                             </Link>
+                            <Link
+                                href={`/admin/users/${user.id}/edit`}
+                                className="text-amber-600 hover:underline text-sm font-medium"
+                            >
+                                Sửa
+                            </Link>
                             <DeleteUserButton id={user.id} email={user.email} />
                         </div>
                     );

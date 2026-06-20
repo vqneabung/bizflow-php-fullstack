@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Services\SpringOAuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,15 +28,24 @@ class UserController extends Controller
      */
     public function index(Request $request): Response
     {
+        $page = (int) $request->input('page', 1);
+        $search = $request->input('search');
+
         try {
-            $users = $this->oauth->getUsers();
+            $result = $this->oauth->getUsers(page: $page, size: 20, search: $search);
+            $users = $result['data'] ?? [];
+            $total = $result['pagination']['totalElements'] ?? 0;
         } catch (\Exception $e) {
             $users = [];
+            $total = 0;
             session()->flash('error', __('messages.user.fetch_failed', ['message' => $e->getMessage()]));
         }
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
+            'total' => $total,
+            'page' => $page,
+            'search' => $search,
             'auth' => ['user' => session('admin_user')],
         ]);
     }
@@ -70,5 +80,36 @@ class UserController extends Controller
         }
 
         return redirect()->route('admin.users.index');
+    }
+
+    public function edit(string $id): Response
+    {
+        try {
+            $user = $this->oauth->callApi('GET', "/api/admin/users/{$id}");
+        } catch (\Exception $e) {
+            $user = null;
+            session()->flash('error', __('messages.user.fetch_failed_single', ['message' => $e->getMessage()]));
+        }
+
+        return Inertia::render('Admin/Users/Edit', [
+            'user' => $user,
+            'auth' => ['user' => session('admin_user')],
+        ]);
+    }
+
+    public function update(UpdateUserRequest $request, string $id): RedirectResponse
+    {
+        try {
+            $this->oauth->callApi('PUT', "/api/admin/users/{$id}", $request->validated());
+            session()->flash('success', __('messages.user.updated'));
+        } catch (\Exception $e) {
+            session()->flash('error', __('messages.user.update_failed', [
+                'message' => $e->getMessage(),
+            ]));
+
+            return redirect()->back()->withInput();
+        }
+
+        return redirect()->route('admin.users.show', $id);
     }
 }
