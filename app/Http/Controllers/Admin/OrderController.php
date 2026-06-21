@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\StoreOrderRequest;
 use App\Services\SpringOAuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -85,5 +86,63 @@ class OrderController extends Controller
         }
 
         return redirect()->route('admin.orders.show', $id);
+    }
+
+    /**
+     * Form tạo đơn hàng — load products + customers để chọn trong form.
+     */
+    public function create(): Response
+    {
+        $products = [];
+        $customers = [];
+        try {
+            $products = $this->oauth->callApiGet('/api/products', ['size' => 100]);
+        } catch (\RuntimeException) {
+            $products = [];
+        }
+        try {
+            $customers = $this->oauth->callApiGet('/api/customers', ['size' => 100]);
+        } catch (\RuntimeException) {
+            $customers = [];
+        }
+
+        return Inertia::render('Admin/Orders/Create', [
+            'products' => $products,
+            'customers' => $customers,
+            'auth' => ['user' => session('admin_user')],
+        ]);
+    }
+
+    /**
+     * Tạo đơn hàng — gọi Spring Boot POST /api/orders.
+     */
+    public function store(StoreOrderRequest $request): RedirectResponse
+    {
+        try {
+            $data = $this->toCamelCase($request->validated());
+            $order = $this->oauth->callApi('POST', '/api/orders', $data);
+
+            return redirect()->route('admin.orders.show', $order['id'])
+                ->with('success', __('messages.order.created'));
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()
+                ->with('error', __('messages.order.create_failed', ['message' => $e->getMessage()]));
+        }
+    }
+
+    /**
+     * Convert snake_case keys → camelCase before forwarding to Spring Boot.
+     *
+     * Spring Boot Jackson defaults to camelCase; Laravel FormRequest returns snake_case.
+     */
+    private function toCamelCase(array $data): array
+    {
+        $result = [];
+        foreach ($data as $key => $value) {
+            $camelKey = preg_replace_callback('/_([a-z])/', fn (array $m): string => strtoupper($m[1]), $key);
+            $result[$camelKey] = is_array($value) ? $this->toCamelCase($value) : $value;
+        }
+
+        return $result;
     }
 }

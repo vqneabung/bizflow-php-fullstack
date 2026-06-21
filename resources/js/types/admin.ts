@@ -33,6 +33,7 @@ export interface SpringProduct {
   name: string
   categoryId: string | null
   categoryName: string | null
+  primaryUnitId: string
   primaryUnitName: string
   price: number
   costPrice: number | null
@@ -119,4 +120,83 @@ export interface Announcement {
   createdBy: string | null
   createdAt: string | null
   updatedAt: string | null
+}
+
+export interface RevenueDailyPoint {
+  date: string
+  revenue: number
+}
+
+export interface RevenueReportResponse {
+  points: RevenueDailyPoint[]
+  total: number
+  periodStart: string
+  periodEnd: string
+}
+
+export interface BestSellingProduct {
+  productId: string
+  productName: string
+  quantitySold: number
+  revenue: number
+}
+
+export interface BestSellingReportResponse {
+  products: BestSellingProduct[]
+}
+
+export interface LowStockProduct {
+  productId: string
+  productName: string
+  stock: number
+  minStock: number
+}
+
+export interface CategoryCount {
+  categoryName: string | null
+  count: number
+}
+
+export interface InventoryReportResponse {
+  totalProducts: number
+  totalValue: number
+  lowStockProducts: LowStockProduct[]
+  byCategory: CategoryCount[]
+}
+
+export interface CustomerDebt {
+  customerId: string | null
+  customerName: string
+  totalDebt: number
+  orderCount: number
+}
+
+export interface DebtReportResponse {
+  totalDebt: number
+  customers: CustomerDebt[]
+}
+
+export interface CreateOrderItemFormData {
+  product_id: string
+  quantity: number
+  unit_price: number
+}
+
+export interface CreateOrderFormData {
+  status: 'DRAFT' | 'CONFIRMED'
+  customer_id: string | null
+  notes: string
+  items: CreateOrderItemFormData[]
+}
+
+export interface CategoryOption {
+  id: string
+  name: string
+  description?: string | null
+}
+
+export interface UnitOption {
+  id: string
+  name: string
+  description?: string | null
 }

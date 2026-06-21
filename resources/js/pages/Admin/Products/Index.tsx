@@ -1,7 +1,7 @@
 /**
  * Products/Index.tsx — Admin product list (TanStack Table).
  */
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -83,13 +83,35 @@ export default function ProductIndex({ products, total, page, search }: Props) {
                 header: 'Thao tác',
                 cell: (info) => {
                     const product = info.row.original;
+                    const handleDeactivate = (): void => {
+                        if (confirm(`Tạm ngưng sản phẩm "${product.name}"?`)) {
+                            router.patch(`/admin/products/${product.id}/deactivate`);
+                        }
+                    };
                     return (
-                        <Link
-                            href={`/admin/products/${product.id}`}
-                            className="text-purple-600 hover:underline text-sm font-medium"
-                        >
-                            Xem
-                        </Link>
+                        <div className="flex items-center gap-3">
+                            <Link
+                                href={`/admin/products/${product.id}`}
+                                className="text-purple-600 hover:underline text-sm font-medium"
+                            >
+                                Xem
+                            </Link>
+                            <Link
+                                href={`/admin/products/${product.id}/edit`}
+                                className="text-purple-600 hover:underline text-sm font-medium"
+                            >
+                                Sửa
+                            </Link>
+                            {product.isActive && (
+                                <button
+                                    type="button"
+                                    onClick={handleDeactivate}
+                                    className="text-red-600 hover:underline text-sm font-medium"
+                                >
+                                    Tạm ngưng
+                                </button>
+                            )}
+                        </div>
                     );
                 },
             }),
@@ -121,21 +143,29 @@ export default function ProductIndex({ products, total, page, search }: Props) {
                         </p>
                     </div>
 
-                    <form method="GET" action="/admin/products" className="flex items-center gap-2">
-                        <input
-                            type="text"
-                            name="search"
-                            defaultValue={search ?? ''}
-                            placeholder="Tìm kiếm sản phẩm..."
-                            className="w-full sm:w-72 rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                        />
-                        <button
-                            type="submit"
+                    <div className="flex items-center gap-2">
+                        <form method="GET" action="/admin/products" className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                name="search"
+                                defaultValue={search ?? ''}
+                                placeholder="Tìm kiếm sản phẩm..."
+                                className="w-full sm:w-72 rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-900 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                            />
+                            <button
+                                type="submit"
+                                className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
+                            >
+                                Tìm
+                            </button>
+                        </form>
+                        <Link
+                            href="/admin/products/create"
                             className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700"
                         >
-                            Tìm
-                        </button>
-                    </form>
+                            Tạo sản phẩm
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">

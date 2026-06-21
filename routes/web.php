@@ -39,9 +39,16 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
     Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('products', [ProductController::class, 'store'])->name('products.store');
     Route::get('products/{id}', [ProductController::class, 'show'])->name('products.show');
+    Route::get('products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('products/{id}', [ProductController::class, 'update'])->name('products.update');
+    Route::patch('products/{id}/deactivate', [ProductController::class, 'deactivate'])->name('products.deactivate');
 
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/create', [OrderController::class, 'create'])->name('orders.create');
+    Route::post('orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show');
     Route::patch('orders/{id}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 

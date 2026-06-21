@@ -20,12 +20,20 @@ return [
     'product' => [
         'fetch_failed' => 'Không thể tải danh sách sản phẩm: :message',
         'fetch_failed_single' => 'Không thể tải sản phẩm: :message',
+        'created' => 'Đã tạo sản phẩm thành công.',
+        'create_failed' => 'Không thể tạo sản phẩm: :message',
+        'updated' => 'Đã cập nhật sản phẩm.',
+        'update_failed' => 'Không thể cập nhật: :message',
+        'deactivated' => 'Đã tạm ngưng sản phẩm.',
+        'deactivate_failed' => 'Không thể tạm ngưng: :message',
     ],
     'order' => [
         'fetch_failed' => 'Không thể tải danh sách đơn hàng: :message',
         'fetch_failed_single' => 'Không thể tải đơn hàng: :message',
         'cancelled' => 'Đơn hàng đã được hủy',
         'cancel_failed' => 'Không thể hủy đơn hàng: :message',
+        'created' => 'Đã tạo đơn hàng thành công.',
+        'create_failed' => 'Không thể tạo đơn hàng: :message',
     ],
     'error' => [
         'token_exchange' => 'Trao đổi token thất bại: :message',

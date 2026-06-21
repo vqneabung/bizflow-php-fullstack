@@ -20,12 +20,20 @@ return [
     'product' => [
         'fetch_failed' => 'Failed to fetch products: :message',
         'fetch_failed_single' => 'Failed to fetch product: :message',
+        'created' => 'Product created successfully.',
+        'create_failed' => 'Failed to create product: :message',
+        'updated' => 'Product updated successfully.',
+        'update_failed' => 'Failed to update product: :message',
+        'deactivated' => 'Product deactivated successfully.',
+        'deactivate_failed' => 'Failed to deactivate product: :message',
     ],
     'order' => [
         'fetch_failed' => 'Failed to fetch orders: :message',
         'fetch_failed_single' => 'Failed to fetch order: :message',
         'cancelled' => 'Order has been cancelled',
         'cancel_failed' => 'Failed to cancel order: :message',
+        'created' => 'Order created successfully.',
+        'create_failed' => 'Failed to create order: :message',
     ],
     'error' => [
         'token_exchange' => 'Token exchange failed: :message',
