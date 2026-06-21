@@ -16,6 +16,9 @@ const navItems = [
   { key: 'users', href: '/admin/users', icon: '👥', label: 'Người dùng' },
   { key: 'products', href: '/admin/products', icon: '📦', label: 'Sản phẩm' },
   { key: 'orders', href: '/admin/orders', icon: '🛒', label: 'Đơn hàng' },
+  { key: 'subscriptions', href: '/admin/subscriptions', icon: '💳', label: 'Gói đăng ký' },
+  { key: 'report-templates', href: '/admin/report-templates', icon: '📋', label: 'Mẫu báo cáo' },
+  { key: 'announcements', href: '/admin/announcements', icon: '📢', label: 'Thông báo' },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -72,3 +72,51 @@ export interface SpringOrderItem {
   unitPrice: number
   subtotal: number
 }
+
+export interface SubscriptionPlan {
+  id: string
+  name: string
+  slug: string
+  monthlyPrice: number
+  annualPrice: number
+  currency: string
+  features: string[]
+  isActive: boolean
+  sortOrder: number
+}
+
+export interface ReportTemplateField {
+  key: string
+  label: string
+  type: 'text' | 'number' | 'date' | 'boolean'
+  width: number | null
+  alignment: 'left' | 'center' | 'right' | null
+}
+
+export interface ReportTemplate {
+  id: string
+  name: string
+  code: string
+  description: string | null
+  circularRef: string
+  version: string
+  fields: ReportTemplateField[]
+  isActive: boolean
+  lastUpdatedBy: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
+
+export interface Announcement {
+  id: string
+  title: string
+  message: string
+  audience: 'all' | 'owners' | 'employees'
+  priority: 'normal' | 'high' | 'urgent'
+  isPublished: boolean
+  publishedAt: string | null
+  expiresAt: string | null
+  createdBy: string | null
+  createdAt: string | null
+  updatedAt: string | null
+}
